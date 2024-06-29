@@ -9,17 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.dededev.pomodorotimer.databinding.FragmentHomeBinding
 import android.os.CountDownTimer
+import android.util.Log
 import com.dededev.pomodorotimer.R
 import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
-    private lateinit var timer: CountDownTimer
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private var isTimerRunning = false
-    private var startTime: Long = 100000L
-    private var timeLeft: Long = startTime
-    private var pausedTimeInMillis: Long = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,58 +27,36 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        homeViewModel.timeLeftInMillis.observe(viewLifecycleOwner) {timeLeft ->
+            updateTimer(binding.homeTimer, timeLeft)
+        }
+
+        homeViewModel.isTimerRunning.observe(viewLifecycleOwner) {isRunning ->
+            binding.btnTimerPlay.text = if (isRunning) getString(R.string.pause) else getString(R.string.play)
+        }
+
+        updateTimer(binding.homeTimer, homeViewModel.initialTime)
+
         binding.btnTimerPlay.setOnClickListener {
-            if (isTimerRunning) {
-                pauseTimer()
-                binding.btnTimerPlay.text = getString(R.string.play)
+            if (homeViewModel.isTimerRunning.value == true) {
+                homeViewModel.pauseTimer()
             } else {
-                startTimer(timeLeft)
-                binding.btnTimerPlay.text = getString(R.string.pause)
+                homeViewModel.startTimer()
             }
         }
 
-        binding.btnTimerReset.setOnClickListener {
-            resetTimer()
-        }
+        binding.btnTimerReset.setOnClickListener { homeViewModel.resetTimer() }
 
-        updateTimer(binding.homeTimer)
+
         return root
     }
 
-    private fun startTimer(totalTime: Long) {
-        timer = object : CountDownTimer(totalTime, 100) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeLeft = millisUntilFinished
-                updateTimer(binding.homeTimer)
-            }
-
-            override fun onFinish() {
-                updateTimer(binding.homeTimer)
-            }
-        }.start()
-
-        isTimerRunning = true
-    }
-
-    private fun pauseTimer() {
-        pausedTimeInMillis = timeLeft
-        timer.cancel()
-        isTimerRunning = false
-    }
-
-    private fun updateTimer(timer: TextView) {
+    private fun updateTimer(timer: TextView, timeLeft: Long) {
         val hours = TimeUnit.MILLISECONDS.toHours(timeLeft)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(timeLeft) % 60
         val seconds = TimeUnit.MILLISECONDS.toSeconds(timeLeft) % 60
 
         timer.text =  String.format("%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
-    private fun resetTimer() {
-        timer.cancel()
-        isTimerRunning = false
-        timeLeft = startTime
-        updateTimer(binding.homeTimer)
     }
 
     override fun onDestroyView() {
