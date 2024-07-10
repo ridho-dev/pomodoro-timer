@@ -13,7 +13,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _isTimerRunning = MutableLiveData<Boolean>()
     val timeLeftInMillis: LiveData<Long> get() = _timeLeftInMillis
     val isTimerRunning: LiveData<Boolean> get() = _isTimerRunning
-    val initialTime = 6900L
+    val initialTime = 10999L
+    val countDownInterval = minOf(initialTime / 500, 1000L)
+
     init {
         _isTimerRunning.value = false
         if (_isTimerRunning.value == true) {
@@ -22,7 +24,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun startTimer() {
-        timer = object : CountDownTimer(_timeLeftInMillis.value ?: initialTime, 250L) {
+        timer = object : CountDownTimer(_timeLeftInMillis.value ?: initialTime, countDownInterval) {
             override fun onTick(millisUntilFinished: Long) {
                 _timeLeftInMillis.value = millisUntilFinished
             }
