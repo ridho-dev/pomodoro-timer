@@ -1,6 +1,5 @@
 package com.dededev.pomodorotimer.ui.home
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +8,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.dededev.pomodorotimer.databinding.FragmentHomeBinding
-import android.os.CountDownTimer
-import android.util.Log
 import com.dededev.pomodorotimer.R
 import java.util.concurrent.TimeUnit
 
@@ -27,8 +24,15 @@ class HomeFragment : Fragment() {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        binding.pbTimeProgress.max = homeViewModel.initialTime.toInt()
-        binding.pbTimeProgress.progress = homeViewModel.initialTime.toInt()
+
+        homeViewModel.initialTime.observe(viewLifecycleOwner) {
+            binding.pbTimeProgress.max = it.toInt()
+            binding.pbTimeProgress.progress = it.toInt()
+        }
+
+        homeViewModel.currentTimerType.observe(viewLifecycleOwner) {
+            binding.textView2.text = it.toString()
+        }
 
         homeViewModel.timeLeftInMillis.observe(viewLifecycleOwner) {timeLeft ->
             updateTimer(binding.homeTimer, timeLeft)
@@ -43,7 +47,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        updateTimer(binding.homeTimer, homeViewModel.initialTime)
+        updateTimer(binding.homeTimer, homeViewModel.initialTime.value!!)
 
         binding.btnTimerPlay.setOnClickListener {
             if (homeViewModel.isTimerRunning.value == true) {
@@ -63,8 +67,7 @@ class HomeFragment : Fragment() {
         val minutes = TimeUnit.MILLISECONDS.toMinutes(timeLeft) % 60
         val seconds = TimeUnit.MILLISECONDS.toSeconds(timeLeft) % 60
 
-        timer.text =  String.format("%02d:%02d",minutes, seconds)
-
+        timer.text =  String.format("%02d:%02d",minutes, seconds + 1)
     }
 
     override fun onDestroyView() {
