@@ -2,7 +2,6 @@ package com.dededev.pomodorotimer.ui.home
 
 import android.app.Application
 import android.os.CountDownTimer
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -30,11 +29,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun startTimer() {
         val currentInitialTime =  _initialTime.value ?: initialFocusTime
         val countDownInterval = minOf(maxOf(currentInitialTime / 2000, 10L), 1000L)
-        Log.i("TAG", "$countDownInterval")
         timer = object : CountDownTimer(_timeLeftInMillis.value ?: currentInitialTime, countDownInterval) {
             override fun onTick(millisUntilFinished: Long) {
                 _timeLeftInMillis.value = millisUntilFinished
-
             }
             override fun onFinish() {
                 _timeLeftInMillis.value = 0L

@@ -1,5 +1,6 @@
 package com.dededev.pomodorotimer.ui.home
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,10 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.dededev.pomodorotimer.databinding.FragmentHomeBinding
 import com.dededev.pomodorotimer.R
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
+    private lateinit var progressBar: CircularProgressIndicator
+    private lateinit var progressAnimator: ObjectAnimator
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -25,9 +29,18 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        homeViewModel.initialTime.observe(viewLifecycleOwner) {
-            binding.pbTimeProgress.max = it.toInt()
-            binding.pbTimeProgress.progress = it.toInt()
+        progressBar = binding.pbTimeProgress
+
+        homeViewModel.initialTime.observe(viewLifecycleOwner) {initialTime ->
+            progressBar.apply {
+                max = initialTime.toInt()
+                progress = initialTime.toInt()
+            }
+            progressAnimator = ObjectAnimator.ofInt(progressBar, "progress", initialTime.toInt() , 0)
+                .setDuration(initialTime)
+            if (homeViewModel.isTimerRunning.value == true) {
+                progressAnimator.start()
+            }
         }
 
         homeViewModel.currentTimerType.observe(viewLifecycleOwner) {
@@ -36,14 +49,19 @@ class HomeFragment : Fragment() {
 
         homeViewModel.timeLeftInMillis.observe(viewLifecycleOwner) {timeLeft ->
             updateTimer(binding.homeTimer, timeLeft)
-            binding.pbTimeProgress.progress = timeLeft.toInt()
         }
 
         homeViewModel.isTimerRunning.observe(viewLifecycleOwner) {isRunning ->
             if (isRunning) {
                 binding.btnTimerPlay.setImageResource(R.drawable.pause_rounded_corner)
+                if (progressAnimator.isPaused) {
+                    progressAnimator.resume()
+                } else {
+                    progressAnimator.start()
+                }
             } else {
                 binding.btnTimerPlay.setImageResource(R.drawable.play)
+                progressAnimator.pause()
             }
         }
 
