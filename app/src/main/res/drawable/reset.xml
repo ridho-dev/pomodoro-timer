@@ -1,0 +1,22 @@
+<vector android:height="32dp" android:viewportHeight="480"
+    android:viewportWidth="480" android:width="32dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#00000000" android:pathData="M0,0h480v480h-480z"/>
+    <group>
+        <clip-path android:pathData="M0.04,-0.04l-256.08,0l-0,256.08l256.08,0z"/>
+        <path android:fillColor="#00000000" android:fillType="nonZero"
+            android:pathData="M-128,31.97C-181.04,31.97 -224.03,74.96 -224.03,128C-224.03,181.03 -181.04,224.03 -128,224.03C-74.96,224.03 -31.97,181.03 -31.97,128C-31.97,97.83 -45.88,70.91 -67.64,53.31"
+            android:strokeColor="#000000" android:strokeLineCap="round"
+            android:strokeLineJoin="round" android:strokeWidth="26"/>
+    </group>
+    <group>
+        <clip-path android:pathData="M0.02,-0.02l-256.08,0l-0,256.08l256.08,0z"/>
+        <path android:fillColor="#00000000" android:fillType="nonZero"
+            android:pathData="M-31.99,47.99L-74.67,47.99L-74.67,90.67"
+            android:strokeColor="#000000" android:strokeLineCap="round"
+            android:strokeLineJoin="round" android:strokeWidth="26"/>
+    </group>
+    <path android:fillColor="#000000" android:fillType="evenOdd"
+        android:pathData="M105.91,204.86c13.56,-51.5 54.45,-94.77 110.53,-109.79c82.3,-22.03 166.7,25.04 188.2,105.33c21.5,80.29 -28.1,163.24 -110.4,185.27c-66.34,17.76 -134.02,-9.37 -169.08,-62.64c-4.57,-6.94 -13.9,-8.86 -20.84,-4.31c-6.94,4.57 -8.86,13.9 -4.3,20.83c41.89,63.68 122.68,96.41 201.99,75.18c98.54,-26.38 157.41,-125.98 131.68,-222.11c-25.74,-96.13 -126.49,-152.99 -225.04,-126.61c-64.38,17.24 -111.86,65.76 -129.83,124.14l-9.42,-16.34c-4.15,-7.19 -13.36,-9.66 -20.55,-5.51c-7.19,4.15 -9.66,13.35 -5.51,20.53l30.07,52.12c4.16,7.2 13.36,9.66 20.55,5.51l52.12,-30.07c7.19,-4.15 9.66,-13.36 5.51,-20.55c-4.15,-7.19 -13.36,-9.66 -20.55,-5.51l-25.14,14.52Z"
+        android:strokeColor="#000000" android:strokeLineCap="butt"
+        android:strokeLineJoin="round" android:strokeWidth="20"/>
+</vector>

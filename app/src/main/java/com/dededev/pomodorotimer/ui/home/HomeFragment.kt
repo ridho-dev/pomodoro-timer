@@ -36,7 +36,11 @@ class HomeFragment : Fragment() {
         }
 
         homeViewModel.isTimerRunning.observe(viewLifecycleOwner) {isRunning ->
-            binding.btnTimerPlay.text = if (isRunning) getString(R.string.pause) else getString(R.string.play)
+            if (isRunning) {
+                binding.btnTimerPlay.setImageResource(R.drawable.pause_rounded_corner)
+            } else {
+                binding.btnTimerPlay.setImageResource(R.drawable.play)
+            }
         }
 
         updateTimer(binding.homeTimer, homeViewModel.initialTime)
@@ -56,11 +60,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateTimer(timer: TextView, timeLeft: Long) {
-        val hours = TimeUnit.MILLISECONDS.toHours(timeLeft)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(timeLeft) % 60
         val seconds = TimeUnit.MILLISECONDS.toSeconds(timeLeft) % 60
 
-        timer.text =  String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        timer.text =  String.format("%02d:%02d",minutes, seconds)
 
     }
 
