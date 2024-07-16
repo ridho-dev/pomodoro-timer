@@ -47,6 +47,11 @@ class HomeFragment : Fragment() {
             binding.textView2.text = it.toString()
         }
 
+        homeViewModel.sessionCount.observe(viewLifecycleOwner) { sessionCount ->
+            binding.tvSessionCount.text =
+                getString(R.string.session_text, sessionCount, homeViewModel.sessionTotal)
+        }
+
         homeViewModel.timeLeftInMillis.observe(viewLifecycleOwner) {timeLeft ->
             updateTimer(binding.homeTimer, timeLeft)
         }

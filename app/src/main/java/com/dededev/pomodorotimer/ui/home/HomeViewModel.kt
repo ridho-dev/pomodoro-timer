@@ -12,18 +12,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _isTimerRunning = MutableLiveData<Boolean>()
     private val _currentTimerType = MutableLiveData<TimerType>()
     private val _initialTime = MutableLiveData<Long>()
+    private val _sessionCount = MutableLiveData<Int>()
     val timeLeftInMillis: LiveData<Long> get() = _timeLeftInMillis
     val currentTimerType: LiveData<TimerType> get() = _currentTimerType
     val isTimerRunning: LiveData<Boolean> get() = _isTimerRunning
     val initialTime: LiveData<Long> get() = _initialTime
-    private val initialFocusTime = 3000L - 1L
-    private val initialBreakTime = 1000L - 1L
+    val sessionCount: LiveData<Int> get() =_sessionCount
+    val sessionTotal = 3
+    private val initialFocusTime = 4000L - 1L
+    private val initialBreakTime = 2000L - 1L
 
     init {
-        _isTimerRunning.value = false
-        _currentTimerType.value = TimerType.FOCUS
-        _timeLeftInMillis.value = initialFocusTime
-        _initialTime.value = initialFocusTime
+        setToInitialState()
     }
 
     fun startTimer() {
@@ -35,11 +35,31 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
             override fun onFinish() {
                 _timeLeftInMillis.value = 0L
-                switchTimer()
-                startTimer()
+                if (isLastSession() && isTimerTypeBreak()) {
+                    resetTimer()
+                    setToInitialState()
+                } else {
+                    addSession()
+                    switchTimer()
+                    startTimer()
+                }
             }
         }.start()
         _isTimerRunning.value = true
+    }
+
+    private fun addSession() {
+        if (isTimerTypeBreak()) {
+            _sessionCount.value = _sessionCount.value?.plus(1)
+        }
+    }
+
+    private fun isTimerTypeBreak(): Boolean {
+        return _currentTimerType.value == TimerType.BREAK
+    }
+
+    private fun isLastSession(): Boolean {
+        return (_sessionCount.value ?: 1) == sessionTotal
     }
 
     fun switchTimer() {
@@ -59,6 +79,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         _timeLeftInMillis.value = _initialTime.value
 
+    }
+
+    private fun setToInitialState() {
+        _isTimerRunning.value = false
+        _currentTimerType.value = TimerType.FOCUS
+        _timeLeftInMillis.value = initialFocusTime
+        _initialTime.value = initialFocusTime
+        _sessionCount.value = 1
     }
 
     fun pauseTimer() {
