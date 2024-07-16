@@ -15,22 +15,32 @@ import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
     private lateinit var progressBar: CircularProgressIndicator
     private lateinit var progressAnimator: ObjectAnimator
-    private val binding get() = _binding!!
+    private lateinit var homeViewModel: HomeViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        progressBar = binding.pbTimeProgress
+        homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
+        // Initial time to Timer UI
+        updateTimer(binding.homeTimer, homeViewModel.initialTime.value!!)
+
+        setupViewModels()
+        setupButtonListeners()
+
+        return root
+    }
+
+    private fun setupViewModels() {
+        // Setup progress bar animation
         homeViewModel.initialTime.observe(viewLifecycleOwner) {initialTime ->
             setupProgressBar(initialTime)
             setupProgressAnimator(initialTime)
@@ -39,25 +49,29 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // Observe Timer Type: FOCUS / BREAK
         homeViewModel.currentTimerType.observe(viewLifecycleOwner) {
             binding.textView2.text = it.toString()
         }
 
+        // Observe Session Counts
         homeViewModel.sessionCount.observe(viewLifecycleOwner) { sessionCount ->
             binding.tvSessionCount.text =
                 getString(R.string.session_text, sessionCount, homeViewModel.sessionTotal)
         }
 
+        // Update the timer UI
         homeViewModel.timeLeftInMillis.observe(viewLifecycleOwner) {timeLeft ->
             updateTimer(binding.homeTimer, timeLeft)
         }
 
+        // Handling start / pause button icon & progress bar animation
         homeViewModel.isTimerRunning.observe(viewLifecycleOwner) {isRunning ->
             handleTimerState(isRunning)
         }
+    }
 
-        updateTimer(binding.homeTimer, homeViewModel.initialTime.value!!)
-
+    private fun setupButtonListeners() {
         binding.btnTimerPlay.setOnClickListener {
             if (homeViewModel.isTimerRunning.value == true) {
                 homeViewModel.pauseTimer()
@@ -68,14 +82,11 @@ class HomeFragment : Fragment() {
 
         binding.btnTimerReset.setOnClickListener { homeViewModel.resetTimer() }
 
-        binding.btnTimerNext.setOnClickListener {
-            homeViewModel.skipToNextPhase()
-        }
-
-        return root
+        binding.btnTimerNext.setOnClickListener { homeViewModel.skipToNextPhase() }
     }
 
     private fun setupProgressBar(initialTime: Long) {
+        progressBar = binding.pbTimeProgress
         progressBar.apply {
             max = initialTime.toInt()
             progress = initialTime.toInt()

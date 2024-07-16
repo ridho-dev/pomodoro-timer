@@ -58,6 +58,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun pauseTimer() {
+        timer.cancel()
+        _isTimerRunning.value = false
+    }
+
+    fun resetTimer() {
+        timer.cancel()
+        _isTimerRunning.value = false
+        setInitialTimeForCurrentTimer()
+    }
+
     private fun addSession() {
         if (isTimerTypeBreak()) {
             _sessionCount.value = _sessionCount.value?.plus(1)
@@ -72,7 +83,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         return (_sessionCount.value ?: 1) == sessionTotal
     }
 
-    fun switchTimer() {
+    private fun switchTimer() {
         _currentTimerType.value = when (_currentTimerType.value) {
             TimerType.FOCUS -> TimerType.BREAK
             TimerType.BREAK -> TimerType.FOCUS
@@ -99,16 +110,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         _sessionCount.value = 1
     }
 
-    fun pauseTimer() {
-        timer.cancel()
-        _isTimerRunning.value = false
-    }
 
-    fun resetTimer() {
-        timer.cancel()
-        _isTimerRunning.value = false
-        setInitialTimeForCurrentTimer()
-    }
 
     enum class TimerType {
         FOCUS, BREAK
