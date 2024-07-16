@@ -32,12 +32,8 @@ class HomeFragment : Fragment() {
         progressBar = binding.pbTimeProgress
 
         homeViewModel.initialTime.observe(viewLifecycleOwner) {initialTime ->
-            progressBar.apply {
-                max = initialTime.toInt()
-                progress = initialTime.toInt()
-            }
-            progressAnimator = ObjectAnimator.ofInt(progressBar, "progress", initialTime.toInt() , 0)
-                .setDuration(initialTime)
+            setupProgressBar(initialTime)
+            setupProgressAnimator(initialTime)
             if (homeViewModel.isTimerRunning.value == true) {
                 progressAnimator.start()
             }
@@ -57,17 +53,7 @@ class HomeFragment : Fragment() {
         }
 
         homeViewModel.isTimerRunning.observe(viewLifecycleOwner) {isRunning ->
-            if (isRunning) {
-                binding.btnTimerPlay.setImageResource(R.drawable.pause_rounded_corner)
-                if (progressAnimator.isPaused) {
-                    progressAnimator.resume()
-                } else {
-                    progressAnimator.start()
-                }
-            } else {
-                binding.btnTimerPlay.setImageResource(R.drawable.play)
-                progressAnimator.pause()
-            }
+            handleTimerState(isRunning)
         }
 
         updateTimer(binding.homeTimer, homeViewModel.initialTime.value!!)
@@ -82,8 +68,37 @@ class HomeFragment : Fragment() {
 
         binding.btnTimerReset.setOnClickListener { homeViewModel.resetTimer() }
 
+        binding.btnTimerNext.setOnClickListener {
+            homeViewModel.skipToNextPhase()
+        }
 
         return root
+    }
+
+    private fun setupProgressBar(initialTime: Long) {
+        progressBar.apply {
+            max = initialTime.toInt()
+            progress = initialTime.toInt()
+        }
+    }
+
+    private fun setupProgressAnimator(initialTime: Long) {
+        progressAnimator = ObjectAnimator.ofInt(progressBar, "progress", initialTime.toInt() , 0)
+            .setDuration(initialTime)
+    }
+
+    private fun handleTimerState(isRunning: Boolean) {
+        if (isRunning) {
+            binding.btnTimerPlay.setImageResource(R.drawable.pause_rounded_corner)
+            if (progressAnimator.isPaused) {
+                progressAnimator.resume()
+            } else {
+                progressAnimator.start()
+            }
+        } else {
+            binding.btnTimerPlay.setImageResource(R.drawable.play)
+            progressAnimator.pause()
+        }
     }
 
     private fun updateTimer(timer: TextView, timeLeft: Long) {

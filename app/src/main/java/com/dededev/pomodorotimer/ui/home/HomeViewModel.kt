@@ -28,8 +28,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startTimer() {
         val currentInitialTime =  _initialTime.value ?: initialFocusTime
-        val countDownInterval = minOf(maxOf(currentInitialTime / 2000, 10L), 1000L)
-        timer = object : CountDownTimer(_timeLeftInMillis.value ?: currentInitialTime, countDownInterval) {
+        timer = object : CountDownTimer(_timeLeftInMillis.value ?: currentInitialTime, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 _timeLeftInMillis.value = millisUntilFinished
             }
@@ -46,6 +45,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
         }.start()
         _isTimerRunning.value = true
+    }
+
+    fun skipToNextPhase() {
+        if (isLastSession() && isTimerTypeBreak()) {
+            resetTimer()
+            setToInitialState()
+        } else {
+            addSession()
+            resetTimer() // reset must be done first before switching to reset the animation
+            switchTimer()
+        }
     }
 
     private fun addSession() {
