@@ -19,7 +19,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val initialTime: LiveData<Long> get() = _initialTime
     val sessionCount: LiveData<Int> get() =_sessionCount
     val sessionTotal = 3
-    private val initialFocusTime = 4000L - 1L
+    private val initialFocusTime = 8000L - 1L
     private val initialBreakTime = 2000L - 1L
 
     init {
@@ -28,7 +28,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startTimer() {
         val currentInitialTime =  _initialTime.value ?: initialFocusTime
-        timer = object : CountDownTimer(_timeLeftInMillis.value ?: currentInitialTime, 1000L) {
+        timer = object : CountDownTimer(_timeLeftInMillis.value ?: currentInitialTime, 10L) {
             override fun onTick(millisUntilFinished: Long) {
                 _timeLeftInMillis.value = millisUntilFinished
             }

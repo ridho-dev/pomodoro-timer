@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -29,11 +30,10 @@ class HomeFragment : Fragment() {
         val root: View = binding.root
 
         homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-
-        // Initial time to Timer UI
-        updateTimer(binding.homeTimer, homeViewModel.initialTime.value!!)
+        progressBar = binding.pbTimeProgress
 
         setupViewModels()
+
         setupButtonListeners()
 
         return root
@@ -44,8 +44,9 @@ class HomeFragment : Fragment() {
         homeViewModel.initialTime.observe(viewLifecycleOwner) {initialTime ->
             setupProgressBar(initialTime)
             setupProgressAnimator(initialTime)
+
             if (homeViewModel.isTimerRunning.value == true) {
-                progressAnimator.start()
+                updateProgressAnimator(initialTime)
             }
         }
 
@@ -86,7 +87,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupProgressBar(initialTime: Long) {
-        progressBar = binding.pbTimeProgress
         progressBar.apply {
             max = initialTime.toInt()
             progress = initialTime.toInt()
@@ -96,6 +96,21 @@ class HomeFragment : Fragment() {
     private fun setupProgressAnimator(initialTime: Long) {
         progressAnimator = ObjectAnimator.ofInt(progressBar, "progress", initialTime.toInt() , 0)
             .setDuration(initialTime)
+        progressAnimator.interpolator = LinearInterpolator()
+    }
+
+    // ProgressBar Animation Progress for OnCreateFragment (Fragment Initiation or Reopen)
+    private fun updateProgressAnimator(initialTime: Long) {
+        var timeLeft = homeViewModel.timeLeftInMillis.value ?: return
+
+        // timeLeft == 0 meaning the timer ready to next session; timeLeft reset to initialTime
+        if (timeLeft.toInt() == 0) timeLeft = initialTime
+
+        progressBar.progress = timeLeft.toInt()
+        progressAnimator.apply {
+            setIntValues((timeLeft).toInt(), 0)
+            duration = timeLeft
+        }.start()
     }
 
     private fun handleTimerState(isRunning: Boolean) {
