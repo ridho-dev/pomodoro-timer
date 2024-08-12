@@ -1,6 +1,7 @@
 package com.dededev.pomodorotimer.ui.home
 
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.dededev.pomodorotimer.databinding.FragmentHomeBinding
 import com.dededev.pomodorotimer.R
+import com.dededev.pomodorotimer.service.PomodoroService
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import java.util.concurrent.TimeUnit
 
@@ -74,16 +76,23 @@ class HomeFragment : Fragment() {
 
     private fun setupButtonListeners() {
         binding.btnTimerPlay.setOnClickListener {
-            if (homeViewModel.isTimerRunning.value == true) {
-                homeViewModel.pauseTimer()
-            } else {
-                homeViewModel.startTimer()
-            }
+//            if (homeViewModel.isTimerRunning.value == true) {
+//                homeViewModel.pauseTimer()
+//            } else {
+//                homeViewModel.startTimer()
+//            }
+            startPomodoroService()
         }
 
         binding.btnTimerReset.setOnClickListener { homeViewModel.resetTimer() }
 
         binding.btnTimerNext.setOnClickListener { homeViewModel.skipToNextPhase() }
+    }
+
+    private fun startPomodoroService() {
+        val pomodoroService = Intent(requireContext(), PomodoroService::class.java)
+        pomodoroService.putExtra(PomodoroService.TIMER_ACTION, PomodoroService.START)
+        requireContext().startService(pomodoroService)
     }
 
     private fun setupProgressBar(initialTime: Long) {
